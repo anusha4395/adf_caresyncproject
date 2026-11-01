@@ -1,1 +1,1 @@
-# adf_caresyncproject
+# This repo is for azure data factory
