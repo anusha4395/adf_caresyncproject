@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-caresyncproj1"
+		},
+		"ls_postgresql_password": {
+			"value": ""
+		},
+		"ls_adls_properties_typeProperties_url": {
+			"value": "https://adlsstorageproj.dfs.core.windows.net/"
+		},
+		"ls_keyvault_properties_typeProperties_baseUrl": {
+			"value": "https://keyvaultproj.vault.azure.net/"
+		},
+		"ls_postgresql_properties_typeProperties_server": {
+			"value": "ep-orange-fire-a1s5fhp3-pooler.ap-southeast-1.aws.neon.tech"
+		},
+		"ls_postgresql_properties_typeProperties_database": {
+			"value": "neondb"
+		},
+		"ls_postgresql_properties_typeProperties_username": {
+			"value": "neondb_owner"
+		}
+	}
+}
