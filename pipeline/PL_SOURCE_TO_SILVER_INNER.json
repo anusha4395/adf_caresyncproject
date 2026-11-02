@@ -49,7 +49,7 @@
 				}
 			},
 			{
-				"name": "copy_Data",
+				"name": "source_to_landing_ingestion",
 				"type": "Copy",
 				"dependsOn": [
 					{
