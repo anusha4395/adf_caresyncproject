@@ -144,7 +144,21 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/caresync-repo/adb_caresync/Landing_to_Bronze"
+					"notebookPath": "/caresync-repo/adb_caresync/Landing_to_Bronze",
+					"baseParameters": {
+						"source_system": {
+							"value": "@activity('Read_table_Details').output.firstRow.source_system",
+							"type": "Expression"
+						},
+						"table_name": {
+							"value": "@activity('Read_table_Details').output.firstRow.silver_table_name",
+							"type": "Expression"
+						},
+						"landing_timestamp": {
+							"value": "@variables('current_time')",
+							"type": "Expression"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "ls_AzureDatabricks",
@@ -171,7 +185,17 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/caresync-repo/adb_caresync/Bronze_to_silver"
+					"notebookPath": "/caresync-repo/adb_caresync/Bronze_to_silver",
+					"baseParameters": {
+						"landing_timestamp": {
+							"value": "@variables('current_time')",
+							"type": "Expression"
+						},
+						"table_name": {
+							"value": "@activity('Read_table_Details').output.firstRow.bronze_table_name",
+							"type": "Expression"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "ls_AzureDatabricks",
