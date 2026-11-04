@@ -5,6 +5,8 @@
 			{
 				"name": "Read source tables list",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -32,7 +34,7 @@
 				}
 			},
 			{
-				"name": "ForEach",
+				"name": "ForEach_copy1",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -51,11 +53,11 @@
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Execute Pipeline",
+							"name": "Execute Pipeline_copy1",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "update_Status_as_inprogress",
+									"activity": "update_Status_as_inprogress_copy1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -74,7 +76,7 @@
 							}
 						},
 						{
-							"name": "update_Status_as_inprogress",
+							"name": "update_Status_as_inprogress_copy1",
 							"type": "Script",
 							"dependsOn": [],
 							"policy": {
@@ -103,11 +105,11 @@
 							}
 						},
 						{
-							"name": "update_status_as_failure",
+							"name": "update_status_as_failure_copy1",
 							"type": "Script",
 							"dependsOn": [
 								{
-									"activity": "Execute Pipeline",
+									"activity": "Execute Pipeline_copy1",
 									"dependencyConditions": [
 										"Failed"
 									]
