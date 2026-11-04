@@ -48,22 +48,94 @@
 						"value": "@activity('Read source tables list').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
-							"name": "Set variable",
-							"type": "SetVariable",
-							"dependsOn": [],
+							"name": "Execute Pipeline",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "update_Status_as_inprogress",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
-								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "test",
-								"value": {
-									"value": "@string(item().table_id)",
-									"type": "Expression"
+								"pipeline": {
+									"referenceName": "PL_SOURCE_TO_SILVER_INNER",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
+							}
+						},
+						{
+							"name": "update_Status_as_inprogress",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresql",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@insert into [ctrl].audit_log(adf_run_id,table_id,stage,status,start_time)\nvalues('',item().table_id,'source_to_silver','in_progress',sysutcdatetime());",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "update_status_as_failure",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Execute Pipeline",
+									"dependencyConditions": [
+										"Failed"
+									]
 								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresql",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "update [ctrl].audit_log\nset status='Failed', end_time=sysutcdatetime()\nwhere adf_run_id='@{pipeline().parameters.adf_run_id}' and table_id=@{item().table_id};",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
 							}
 						}
 					]
@@ -74,6 +146,10 @@
 			"source_system": {
 				"type": "string",
 				"defaultValue": "neon_postgres"
+			},
+			"adf_run_id": {
+				"type": "string",
+				"defaultValue": "a1"
 			}
 		},
 		"variables": {
