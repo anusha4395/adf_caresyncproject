@@ -5,6 +5,8 @@
 			{
 				"name": "Set Current Time",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -22,7 +24,14 @@
 			{
 				"name": "Read_table_Details",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 2,
@@ -35,7 +44,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select * from ctrl.table_config where table_id=@{pipeline().parameters.table_id}",
+							"value": "select * from ctrl.table_config where table_id=@{variables('table_id')}",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -51,6 +60,8 @@
 			{
 				"name": "source_to_landing_ingestion",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Read_table_Details",
@@ -237,11 +248,28 @@
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "table_id",
+					"value": {
+						"value": "@pipeline().parameters.table_id",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
 			"table_id": {
-				"type": "string"
+				"type": "int"
 			},
 			"adf_run_id": {
 				"type": "string"
@@ -250,6 +278,9 @@
 		"variables": {
 			"current_time": {
 				"type": "String"
+			},
+			"table_id": {
+				"type": "Integer"
 			}
 		},
 		"annotations": []
