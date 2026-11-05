@@ -5,8 +5,6 @@
 			{
 				"name": "Set Current Time",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -37,7 +35,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select * from ctrl.table_config where table_id=@{variables('table_id')}",
+							"value": "select * from ctrl.table_config where table_id=@{pipeline().parameters.table_id}",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -47,14 +45,12 @@
 						"referenceName": "ds_azuresql",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": true
+					"firstRowOnly": false
 				}
 			},
 			{
 				"name": "source_to_landing_ingestion",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Read_table_Details",
@@ -256,10 +252,6 @@
 		"variables": {
 			"current_time": {
 				"type": "String"
-			},
-			"table_id": {
-				"type": "Integer",
-				"defaultValue": 1
 			}
 		},
 		"annotations": []
