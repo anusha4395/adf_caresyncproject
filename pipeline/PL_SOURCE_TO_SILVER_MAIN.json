@@ -94,7 +94,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "@insert into [ctrl].audit_log(adf_run_id,table_id,stage,status,start_time)\nvalues('',item().table_id,'source_to_silver','in_progress',sysutcdatetime());",
+											"value": "insert into [ctrl].audit_log(adf_run_id,table_id,stage,status,start_time)\nvalues('',@{item().table_id},'source_to_silver','in_progress',sysutcdatetime());",
 											"type": "Expression"
 										}
 									}
