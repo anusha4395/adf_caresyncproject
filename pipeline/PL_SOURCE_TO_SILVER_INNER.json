@@ -71,7 +71,7 @@
 					"source": {
 						"type": "PostgreSqlV2Source",
 						"query": {
-							"value": "select * from public.@{activity('Read_table_Details').output.firstRow.source_table_name}\n@{\n    if(equals(activity('Read_watermark_value').output.firstRow.load_type,'FULL')\n    ,'',\n    concat('where ',activity('Read_watermark_value').output.firstRow.watremark_column,' >','''',variables('watermark_value'),'''')\n    )\n}",
+							"value": "select * from public.@{activity('Read_table_Details').output.firstRow.source_table_name}\n@{\n    if(equals(activity('Read_watermark_value').output.firstRow.load_type,'FULL')\n    ,'',\n    concat('where ',activity('Read_watermark_value').output.firstRow.watermark_column,' >','''',variables('watermark_value'),'''')\n    )\n}",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -187,6 +187,14 @@
 						},
 						"table_name": {
 							"value": "@activity('Read_table_Details').output.firstRow.bronze_table_name",
+							"type": "Expression"
+						},
+						"load_type": {
+							"value": "@activity('Read_table_Details').output.firstRow.load_type",
+							"type": "Expression"
+						},
+						"merge_keys": {
+							"value": "@coalesce(activity('Read_table_Details').output.firstRow.merge_keys,'')",
 							"type": "Expression"
 						}
 					}
@@ -306,6 +314,56 @@
 									"value": "@activity('Read_watermark_value').output.firstRow.watermark_value",
 									"type": "Expression"
 								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "check load type and update watermark",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Notebook2-bronze_to_silver_layer",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(equals(activity('Read_table_Details').output.firstRow.load_type,'FULL'))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "update watermark table",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresql",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "update ctrl.watermark\nset watremark_value= UTCSYSTIMEDATE()\nwhere table_id=@{pipeline().parameters.table_id}",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
 							}
 						}
 					]
