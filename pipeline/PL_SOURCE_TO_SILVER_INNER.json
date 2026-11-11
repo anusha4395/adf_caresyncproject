@@ -83,7 +83,7 @@
 							"type": "Expression"
 						},
 						"source_file_format": {
-							"value": "@concat(activity('Read_watermark_value').output.firstRow.source_file_format,'')",
+							"value": "@concat(activity('Read_table_Details').output.firstRow.source_file_format,'')",
 							"type": "Expression"
 						}
 					}
